@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -49,6 +50,97 @@ export default function Home() {
           >
             Read our docs
           </a>
+        </div>
+
+        <h1 className="text-3xl font-bold mb-8">Next.js App Router Examples</h1>
+        
+        <div className="space-y-6">
+          <section className="border p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Dynamic Routes</h2>
+            <div className="space-y-2">
+              <Link 
+                href="/blog/first-post" 
+                className="block text-blue-500 hover:underline"
+              >
+                /blog/first-post
+              </Link>
+              <Link 
+                href="/blog/second-post" 
+                className="block text-blue-500 hover:underline"
+              >
+                /blog/second-post
+              </Link>
+            </div>
+          </section>
+
+          <section className="border p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Nested Dynamic Routes</h2>
+            <div className="space-y-2">
+              <Link 
+                href="/users/123/posts/456" 
+                className="block text-blue-500 hover:underline"
+              >
+                /users/123/posts/456
+              </Link>
+              <Link 
+                href="/users/789/posts/101" 
+                className="block text-blue-500 hover:underline"
+              >
+                /users/789/posts/101
+              </Link>
+            </div>
+          </section>
+
+          <section className="border p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Route Groups</h2>
+            <div className="space-y-2">
+              <Link 
+                href="/about" 
+                className="block text-blue-500 hover:underline"
+              >
+                /about (Marketing Group)
+              </Link>
+            
+              <Link 
+                href="/contact" 
+                className="block text-blue-500 hover:underline"
+              >
+                /contact (Marketing Group)
+              </Link>
+              <Link 
+                href="/pricing" 
+                className="block text-blue-500 hover:underline"
+              >
+                /pricing (Marketing Group)
+              </Link>
+            </div>
+          </section>
+
+          <section className="border p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Optional Catch-all Routes</h2>
+            <div className="space-y-2">
+              <Link 
+                href="/docs" 
+                className="block text-blue-500 hover:underline"
+              >
+                /docs (Root)
+              </Link>
+              <Link 
+                href="/docs/getting-started" 
+                className="block text-blue-500 hover:underline"
+              >
+                /docs/getting-started
+              </Link>
+              <Link 
+                href="/docs/advanced/configuration" 
+                className="block text-blue-500 hover:underline"
+              >
+                /docs/advanced/configuration
+              </Link>
+            </div>
+          </section>
+
+          
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
