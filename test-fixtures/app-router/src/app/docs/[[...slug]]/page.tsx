@@ -2,14 +2,15 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 
 type Props = {
-  params: {
+  params: Promise<{
     slug?: string[]
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const title = params.slug 
-    ? `Docs: ${params.slug.join('/')}`
+  const { slug } = await params
+  const title = slug 
+    ? `Docs: ${slug.join('/')}`
     : 'Documentation'
 
   return {
@@ -17,9 +18,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function DocsPage({ params }: Props) {
-  const title = params.slug 
-    ? `Docs: ${params.slug.join('/')}`
+export default async function DocsPage({ params }: Props) {
+  const { slug } = await params
+  const title = slug 
+    ? `Docs: ${slug.join('/')}`
     : 'Documentation'
 
   return (
