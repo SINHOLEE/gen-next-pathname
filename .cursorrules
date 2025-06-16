@@ -1,0 +1,191 @@
+# Gen-Next-Pathname 프로젝트 규칙
+
+## 프로젝트 목적
+Next.js의 directory page 구조를 쉽게 사용할 수 있도록 타입이 완벽한 상수를 자동 생성하는 CLI 도구
+
+## 프로젝트 아키텍처
+
+### 언어 선택
+- **Go 언어** 사용 (성능과 유지보수성을 위해)
+- TypeScript 파일 생성 기능 구현
+- CLI 배포를 위한 구조 설계
+
+### 지원 기능
+- Next.js page 파일의 dynamic path parameters 지원
+- slug 문법 완전 지원
+- 디렉토리 구조 읽기 및 분석
+- TypeScript 타입 안전성 보장
+- **Next.js 설정 파일 동적 해석**
+
+## 개발 방식
+
+### TDD (Test-Driven Development)
+1. **테스트 케이스 작성** (한글 조건)
+2. **테스트를 통과하는 최소한의 구현**
+3. **코드 리팩토링**
+
+### 테스트 파일 패턴
+- Go: `*_test.go`
+- 모든 테스트 조건은 한글로 작성
+- 구현 변수는 영어 사용
+
+## 파일 명명 규칙
+
+### Go 파일
+- snake_case 사용
+- 예: `path_generator.go`, `cli_handler.go`, `config_parser.go`
+- 테스트 파일: `path_generator_test.go`, `config_parser_test.go`
+
+### 생성될 TypeScript 파일
+- kebab-case 사용
+- 예: `generated-paths.ts`, `route-types.ts`
+
+### 폴더 구조
+- kebab-case 사용
+- 예: `cmd/`, `internal/`, `pkg/`, `test-fixtures/`
+
+## CLI 배포 구조
+
+### 프로젝트 구조
+```
+gen-next-pathname/
+├── cmd/                    # CLI 진입점
+│   ├── config/            # Next.js 설정 파서
+│   ├── parser/            # 디렉토리 구조 파서
+│   └── generator/         # TypeScript 코드 생성기
+├── pkg/                   # 공용 패키지
+│   ├── app-router/        # App Router 테스트 케이스
+│   ├── pages-router/      # Pages Router 테스트 케이스
+│   └── custom-config/     # 커스텀 설정 테스트 케이스
+├── test-fixtures/         # 테스트용 샘플 프로젝트
+├── go.mod
+├── go.sum
+├── README.md
+└── .cursorrules
+```
+
+### NPX 배포 목표
+- `npx gen-next-pathname` 형식으로 실행 가능
+- Go 바이너리를 npm 패키지로 래핑
+- 크로스 플랫폼 지원 (Windows, macOS, Linux)
+
+## Next.js 설정 파일 지원
+
+### 지원하는 설정 파일 형식
+- `next.config.js`
+- `next.config.mjs`
+- `next.config.ts`
+- JSON 형태의 설정 (package.json 내 next 필드)
+
+### 읽어야 할 설정 항목들
+1. **pageExtensions**: 페이지 파일 확장자 설정
+   ```javascript
+   // 예: ['js', 'jsx', 'ts', 'tsx', 'mdx']
+   pageExtensions: ['js', 'jsx', 'ts', 'tsx']
+   ```
+
+2. **experimental.appDir**: App Router 사용 여부
+   ```javascript
+   experimental: {
+     appDir: true
+   }
+   ```
+
+3. **trailingSlash**: URL 끝 슬래시 처리
+   ```javascript
+   trailingSlash: true
+   ```
+
+4. **basePath**: 애플리케이션 기본 경로
+   ```javascript
+   basePath: '/docs'
+   ```
+
+5. **assetPrefix**: 정적 파일 경로 접두사
+   ```javascript
+   assetPrefix: 'https://cdn.mydomain.com'
+   ```
+
+6. **rewrites/redirects**: URL 재작성 규칙
+   ```javascript
+   rewrites: async () => [
+     {
+       source: '/api/:path*',
+       destination: 'https://api.example.com/:path*'
+     }
+   ]
+   ```
+
+### 설정 파서 구현 요구사항
+1. **JavaScript/TypeScript 설정 실행**: Node.js 환경에서 설정 파일 동적 실행
+2. **의존성 해결**: 설정 파일의 import/require 구문 처리
+3. **환경 변수 지원**: process.env 기반 조건부 설정 처리
+4. **에러 처리**: 잘못된 설정 파일에 대한 명확한 오류 메시지
+
+### 동적 파일 해석 전략
+1. **설정 우선순위**:
+   - 명시적 CLI 옵션
+   - next.config.* 파일
+   - package.json의 next 필드
+   - 기본값 적용
+
+2. **파일 확장자 동적 감지**:
+   ```go
+   // 예시 구현 로직
+   pageExtensions := config.GetPageExtensions() // ['js', 'jsx', 'ts', 'tsx']
+   for _, ext := range pageExtensions {
+       // 각 확장자별로 페이지 파일 스캔
+   }
+   ```
+
+3. **라우터 타입 자동 감지**:
+   - `app/` 디렉토리 존재 여부로 App Router 판단
+   - `pages/` 디렉토리로 Pages Router 판단
+   - 혼재 환경 지원
+
+## 개발 환경
+
+### Node.js 버전 관리
+- 프로젝트 시작 시 `nvm use` 실행
+- `.nvmrc` 파일로 버전 고정
+
+### 의존성 관리
+- Go: `go.mod`로 의존성 관리
+- NPM: CLI 배포용 `package.json` 관리
+- 프로젝트 시작 시 의존성 확인 필수
+
+## 코드 품질
+
+### 구현 원칙
+1. **타입 안전성**: 생성되는 TypeScript 코드의 완벽한 타입 지원
+2. **성능**: Go 언어의 빠른 파일 시스템 처리 활용
+3. **유지보수성**: 명확한 모듈 분리와 테스트 커버리지
+4. **확장성**: 다양한 Next.js 라우팅 패턴 지원
+5. **호환성**: 다양한 Next.js 설정과 버전 지원
+
+### 테스트 커버리지
+- 모든 핵심 기능에 대한 단위 테스트
+- 통합 테스트로 실제 Next.js 프로젝트 시뮬레이션
+- 엣지 케이스 테스트 (복잡한 dynamic routes, nested paths)
+- **설정 파일 파싱 테스트**: 다양한 설정 조합에 대한 테스트
+
+## 특별 고려사항
+
+### Next.js 지원 범위
+- App Router와 Pages Router 모두 지원
+- Dynamic routes: `[id]`, `[...slug]`, `[[...slug]]`
+- Nested dynamic routes
+- Route groups: `(group)`
+- Parallel routes: `@modal`
+- **커스텀 페이지 확장자**: 설정에 따른 동적 파일 감지
+
+### 오류 처리
+- 잘못된 디렉토리 구조에 대한 명확한 에러 메시지
+- 지원하지 않는 파일 패턴에 대한 경고
+- 생성 실패 시 롤백 기능
+- **설정 파일 오류**: 파싱 실패, 의존성 누락 등에 대한 처리
+
+### 설정 파일 관련 제약사항
+- 복잡한 동적 설정은 기본값으로 대체
+- 외부 API 호출이 포함된 설정은 타임아웃 처리
+- 순환 참조 방지를 위한 안전장치 구현 
